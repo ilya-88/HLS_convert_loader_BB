@@ -1,13 +1,11 @@
 import json
 import os
-from PyQt5.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-    QPushButton, QCheckBox, QFileDialog, QTextEdit, QDialog
-)
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QFileDialog, QTextEdit
 from PyQt5.QtCore import QThread, pyqtSignal
 import sys
 import logging
 from datetime import datetime
+from auth_dialog import AuthDialog  # Импортируем AuthDialog
 from hls_converter import convert_to_hls
 from uploader import upload_to_backblaze
 from video_selector import select_video_file, get_video_quality
@@ -16,69 +14,6 @@ from video_selector import select_video_file, get_video_quality
 logging.basicConfig(filename="log.txt", level=logging.INFO, format="%(asctime)s - %(message)s")
 
 AUTH_FILE = "auth_data.json"
-
-class AuthDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Настройки авторизации")
-        
-        # Поля для авторизации Backblaze
-        self.bucket_name_input = QLineEdit()
-        self.application_key_id_input = QLineEdit()
-        self.application_key_input = QLineEdit()
-        self.region_input = QLineEdit("s3.eu-central-003")
-        
-        # Загрузка данных при открытии диалога
-        self.load_auth_data()
-        
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Имя корзины:"))
-        layout.addWidget(self.bucket_name_input)
-        layout.addWidget(QLabel("ID ключа:"))
-        layout.addWidget(self.application_key_id_input)
-        layout.addWidget(QLabel("Ключ:"))
-        layout.addWidget(self.application_key_input)
-        layout.addWidget(QLabel("Регион:"))
-        layout.addWidget(self.region_input)
-        
-        # Кнопка подтверждения
-        self.confirm_button = QPushButton("Подтвердить")
-        self.confirm_button.clicked.connect(self.save_and_close)  # Сохраняем данные и закрываем окно
-        layout.addWidget(self.confirm_button)
-
-        self.setLayout(layout)
-        self.setFixedSize(300, 250)
-
-    def save_and_close(self):
-        """Сохраняет данные авторизации в файл и закрывает окно."""
-        auth_data = {
-            "bucket_name": self.bucket_name_input.text(),
-            "application_key_id": self.application_key_id_input.text(),
-            "application_key": self.application_key_input.text(),
-            "region": self.region_input.text()
-        }
-        with open(AUTH_FILE, "w") as file:
-            json.dump(auth_data, file)
-        self.accept()  # Закрывает окно
-
-    def load_auth_data(self):
-        """Загружает данные авторизации из файла, если они существуют."""
-        if os.path.exists(AUTH_FILE):
-            with open(AUTH_FILE, "r") as file:
-                auth_data = json.load(file)
-                self.bucket_name_input.setText(auth_data.get("bucket_name", ""))
-                self.application_key_id_input.setText(auth_data.get("application_key_id", ""))
-                self.application_key_input.setText(auth_data.get("application_key", ""))
-                self.region_input.setText(auth_data.get("region", "s3.eu-central-003"))
-
-    def get_credentials(self):
-        """Возвращает данные авторизации."""
-        return {
-            "bucket_name": self.bucket_name_input.text(),
-            "application_key_id": self.application_key_id_input.text(),
-            "application_key": self.application_key_input.text(),
-            "region": self.region_input.text()
-        }
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -212,7 +147,8 @@ class MainWindow(QWidget):
                 self.auth_data["bucket_name"], 
                 self.auth_data["application_key_id"], 
                 self.auth_data["application_key"], 
-                self.auth_data["region"]
+                self.auth_data["region"],
+                self.auth_data["server_name"]
             )
             self.update_status(f"Загрузка завершена.\nДружественная ссылка: {friendly_url}\nS3-совместимая ссылка: {s3_url}")
         else:
@@ -223,3 +159,11 @@ class MainWindow(QWidget):
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.status_display.append(f"{timestamp} - {message}")
         logging.info(message)
+
+
+# Для запуска приложения
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

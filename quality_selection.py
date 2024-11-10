@@ -1,3 +1,12 @@
+"""
+Этот файл является частью проекта HLS_convert_loader_BB.
+Создан совместно пользователем ilya-88 и ChatGPT (OpenAI) для управления выбором уровней качества видео, доступных для конвертации в HLS.
+
+File purpose: Этот файл содержит функционал для отображения и выбора доступных уровней качества, основываясь на разрешении исходного видео.
+"""
+
+
+
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QCheckBox, QPushButton, QMessageBox
 
 class QualitySelectionWindow(QWidget):

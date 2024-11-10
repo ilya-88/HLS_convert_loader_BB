@@ -1,3 +1,16 @@
+"""
+Этот файл является частью проекта HLS_convert_loader_BB.
+Создан совместно пользователем ilya-88 и ChatGPT (OpenAI) для реализации конвертации видео в HLS и подготовки файлов для загрузки на Backblaze B2.
+
+File purpose: Этот файл содержит функции для конвертации видеофайлов в HLS-формат с различными уровнями качества, создавая уникальную структуру папок для каждого процесса конвертации.
+
+This file is part of the HLS_convert_loader_BB project.
+Created collaboratively by GitHub user ilya-88 and ChatGPT (OpenAI) to enable HLS video conversion and preparation for upload to Backblaze B2.
+
+File purpose: This file contains functions to convert video files to HLS format with multiple quality levels, creating a unique folder structure for each conversion process.
+"""
+
+
 import subprocess
 import os
 from uuid import uuid4
